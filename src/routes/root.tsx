@@ -20,9 +20,23 @@ export default function Root() {
   const [data, setData] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchText, setSearchText] = useState('');
+  const [query, setQuery] = useState<string>("");
   return (<div>
-    <div>Search Bar</div>
+    <div className="wrapper">
+      <div className="search-wrapper">
+        <label htmlFor="search-form">
+          <input
+            type="search"
+            name="search-form"
+            id="search-form"
+            className="search-input"
+            placeholder="Search for..."
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <span className="sr-only">Search players here</span>
+        </label>
+      </div>
+    </div>
     <div>Grid of players, filters when search is added</div>
     <div>Need to do pagination search</div>
     {loading && <div>A moment please...</div>}
