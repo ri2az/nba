@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom/client';
 import {
   createBrowserRouter,
   RouterProvider,
-} from "react-router-dom";  
+} from "react-router-dom";
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import Root from "./routes/root";
+import Root from "./routes/Root";
+import PlayerPage from "./routes/PlayerPage";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
+  },
+  {
+    path: "player/:playerId",
+    element: <PlayerPage />,
   },
 ]);
 root.render(

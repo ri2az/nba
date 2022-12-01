@@ -3,6 +3,7 @@ import { Player } from "../types";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import { DataGrid, GridCallbackDetails, GridColDef, GridRowParams, GridToolbar, GridValueGetterParams, MuiEvent } from '@mui/x-data-grid';
+import { useNavigate } from "react-router-dom";
 
 /**
  * Home page where we see all the players to choose from, and we can filter the
@@ -53,8 +54,10 @@ export default function Root() {
   ];
 
   // TODO: have row click go into player page
+  const navigate = useNavigate();
   const handleRowClick = (params: GridRowParams, event: MuiEvent<React.MouseEvent>, details: GridCallbackDetails) => {
     console.log(params.row.first_name, 'clicked');
+    navigate(`/player/${params.row.id}`);
   };
 
   return (<div>
