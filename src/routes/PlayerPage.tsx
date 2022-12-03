@@ -39,6 +39,13 @@ function SeasonAverageStats(stats: SeasonAverage) {
 export default function PlayerPage() {
   let { playerId } = useParams();
   let startDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
+  const statDateComparator =
+    (stats1: Stats, stats2: Stats) =>
+      moment(stats1.game.date).isAfter(
+        moment(stats2.game.date)) ? -1 : 1;
+  const dateComparator = (date1: string, date2: string) =>
+    moment(date1).isAfter(
+      moment(date2)) ? -1 : 1;
   useEffect(() => {
     Promise.all([
       fetch(`https://www.balldontlie.io/api/v1/stats?player_ids[]=${playerId}&start_date=${startDate}`).then(resp => resp.json()),
@@ -46,10 +53,7 @@ export default function PlayerPage() {
       fetch(`https://www.balldontlie.io/api/v1/season_averages?player_ids[]=${playerId}`).then(resp => resp.json()),
     ]).then(res => {
       setData(
-        res[0].data.sort((stats1: Stats, stats2: Stats) =>
-          moment(stats1.game.date).isAfter(
-            moment(stats2.game.date)) ? -1 : 1)
-      );
+        res[0].data.sort(statDateComparator));
       setPlayer(res[1]);
       setSeasonAverage(res[2].data);
     })
@@ -71,14 +75,15 @@ export default function PlayerPage() {
   const columns: GridColDef[] = [
     {
       field: 'date', headerName: 'Date', width: 130,
-      valueGetter: (params: GridValueGetterParams) => moment(params.row.game.date).format('ddd MM/DD')
+      valueGetter: (params: GridValueGetterParams) => moment(params.row.game.date).format('ddd MM/DD'),
+      sortComparator: dateComparator
     },
     // { field: 'opponent', headerName: 'Opponent', width: 130 },
     // { field: 'result', headerName: 'Opponent', width: 130 },
     {
       field: 'min',
       headerName: 'MIN',
-      width: 50,
+      width: 70,
     },
     {
       field: 'fg_pct',
@@ -148,7 +153,6 @@ export default function PlayerPage() {
             rows={data}
             columns={columns}
             pageSize={30}
-            components={{ Toolbar: GridToolbar }}
           />
         </div>
       </div>
