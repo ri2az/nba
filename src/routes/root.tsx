@@ -4,14 +4,16 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import { DataGrid, GridCallbackDetails, GridColDef, GridRowParams, GridToolbar, GridValueGetterParams, MuiEvent } from '@mui/x-data-grid';
 import { useNavigate } from "react-router-dom";
+import { TextField } from "@mui/material";
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 
 /**
  * Home page where we see all the players to choose from, and we can filter the
  * players with query specifiers.
  */
 export default function Root() {
-  const fetchPlayers = (page: number, pageSize: number) => {
-    fetch(`https://www.balldontlie.io/api/v1/players?page=${page}&per_page=${pageSize}`)
+  const fetchPlayers = (page: number, pageSize: number, searchQuery: string) => {
+    fetch(`https://www.balldontlie.io/api/v1/players?page=${page}&per_page=${pageSize}&search=${searchQuery}`)
       .then(response => {
         if (!response.ok) {
           throw new Error(
@@ -27,13 +29,17 @@ export default function Root() {
       .catch(err => setError(err))
       .finally(() => setLoading(false));
   };
+  const fetchPlayersDebounced = AwesomeDebouncePromise(fetchPlayers, 300);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(25);
   const [data, setData] = useState<PlayerEndpoint>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => fetchPlayers(page+1, pageSize), [page, pageSize]);
+  useEffect(() => {
+    fetchPlayersDebounced(page + 1, pageSize, searchQuery);
+  }, [page, pageSize, searchQuery]);
 
   const [rowCountState, setRowCountState] = useState(
     data?.meta.total_count || 0,
@@ -81,7 +87,12 @@ export default function Root() {
         NBA STATS
       </Grid>
       <Grid xs={12}>
-        <div>Need to do pagination search</div>
+        <TextField
+          value={searchQuery}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setSearchQuery(event.target.value);
+          }}
+        />
         <div style={{ height: 800, width: '100%' }}>
           <DataGrid
             rows={data?.data || []}
