@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Player, PlayerEndpoint } from "../types";
+import { PlayerEndpoint } from "../types";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import { DataGrid, GridCallbackDetails, GridColDef, GridRowParams, GridToolbar, GridValueGetterParams, MuiEvent } from '@mui/x-data-grid';
@@ -68,7 +68,6 @@ export default function Root() {
 
   const navigate = useNavigate();
   const handleRowClick = (params: GridRowParams, event: MuiEvent<React.MouseEvent>, details: GridCallbackDetails) => {
-    console.log(params.row.first_name, 'clicked');
     navigate(`/player/${params.row.id}`);
   };
   useEffect(() => {

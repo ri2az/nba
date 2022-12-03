@@ -4,8 +4,8 @@ import { useParams } from "react-router-dom";
 import { Stats, SeasonAverage, Player, Game, Team } from "../types";
 import PlayerCard from "./PlayerCard";
 import moment from 'moment';
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import SeasonAverageStats from "./SeasonAverageStats";
+import { DataGrid, GridColDef, GridRowParams, GridValueGetterParams } from "@mui/x-data-grid";
+import { useNavigate } from "react-router-dom";
 
 type TEAM_LOOKUP_TYPE = Record<number, Team>;
 
@@ -142,8 +142,16 @@ export default function PlayerPage() {
     },
   ];
 
+  const navigate = useNavigate();
+  const handleHomeClick = () => {
+    navigate(`/`);
+  };
+
   return loading ? <>Loading</> : <div>
     <Box sx={{ flexGrow: 1, width: '80vw' }} m="auto">
+      <h4 id="go-back" onClick={handleHomeClick} style={{ cursor: 'pointer'}}>
+        Go back to all players page
+      </h4>
       {player && <PlayerCard player={player} stats={
         seasonAverage?.length == 1 ? seasonAverage[0] : null
       } />}
