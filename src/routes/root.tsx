@@ -46,12 +46,12 @@ export default function Root() {
   );
 
   const columns: GridColDef[] = [
-    { field: 'first_name', headerName: 'First name', width: 130 },
-    { field: 'last_name', headerName: 'Last name', width: 130 },
+    { field: 'first_name', headerName: 'First name', width: 200 },
+    { field: 'last_name', headerName: 'Last name', width: 200 },
     {
       field: 'position',
       headerName: 'Position',
-      width: 90,
+      width: 160,
     },
     {
       field: 'height',
@@ -62,12 +62,11 @@ export default function Root() {
     {
       field: 'team',
       headerName: 'Team',
-      width: 90,
+      width: 160,
       valueGetter: (params: GridValueGetterParams) => params.row.team.name,
     }
   ];
 
-  // TODO: have row click go into player page
   const navigate = useNavigate();
   const handleRowClick = (params: GridRowParams, event: MuiEvent<React.MouseEvent>, details: GridCallbackDetails) => {
     console.log(params.row.first_name, 'clicked');
@@ -82,31 +81,37 @@ export default function Root() {
   }, [data?.meta.total_count, setRowCountState]);
 
   return (<div>
-    <Box sx={{ flexGrow: 1 }} m="auto">
-      <Grid xs={12}>
-        NBA STATS
+    <Box sx={{ flexGrow: 1, width: '80vw', flexDirection: 'column' }} m="auto" display="flex" justifyContent="center">
+      <Grid xs={12} height={'10vh'} justifyContent={'center'}>
+        <h1>
+          NBA STATS
+        </h1>
       </Grid>
-      <Grid xs={12}>
+      <Grid xs={12} height={'10vh'}>
         <TextField
+          label={"Search player by name"}
           value={searchQuery}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setSearchQuery(event.target.value);
           }}
+          fullWidth={true}
         />
-        <div style={{ height: 800, width: '100%' }}>
-          <DataGrid
-            rows={data?.data || []}
-            rowCount={rowCountState}
-            columns={columns}
-            pageSize={pageSize}
-            paginationMode="server"
-            onPageChange={(newPage) => setPage(newPage)}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            onRowClick={handleRowClick}
-            components={{ Toolbar: GridToolbar }}
-            loading={loading}
-          />
-        </div>
+      </Grid>
+      <Grid xs={12}>
+      <div style={{ height: '80vh' }}>
+        <DataGrid
+          rows={data?.data || []}
+          rowCount={rowCountState}
+          columns={columns}
+          pageSize={pageSize}
+          paginationMode="server"
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          onRowClick={handleRowClick}
+          components={{ Toolbar: GridToolbar }}
+          loading={loading}
+        />
+      </div>
       </Grid>
     </Box>
   </div>);
