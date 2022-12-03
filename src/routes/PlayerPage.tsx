@@ -5,37 +5,7 @@ import { Stats, SeasonAverage, Player, Game, Team } from "../types";
 import PlayerCard from "./PlayerCard";
 import moment from 'moment';
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import { green, red } from '@mui/material/colors';
-
-function SeasonAverageStats(stats: SeasonAverage) {
-  return <div>
-    Stats for {stats.season}:
-    <div>
-      PPG: {stats.pts}
-    </div>
-    <div>
-      APG: {stats.ast}
-    </div>
-    <div>
-      REB: {stats.reb}
-    </div>
-    <div>
-      STL: {stats.stl}
-    </div>
-    <div>
-      BLK: {stats.blk}
-    </div>
-    <div>
-      TO: {stats.turnover}
-    </div>
-    <div>
-      FG%: {Math.round(stats.fg_pct * 1000) / 10}%
-    </div>
-    <div>
-      3P%: {Math.round(stats.fg3_pct * 1000) / 10}%
-    </div>
-  </div>;
-}
+import SeasonAverageStats from "./SeasonAverageStats";
 
 type TEAM_LOOKUP_TYPE = Record<number, Team>;
 
@@ -81,7 +51,6 @@ export default function PlayerPage() {
   const emptyStats = <div>No stats found for {playerName}</div>;
   const playerStats = (
     <></>);
-  const currentSeasonAverages = seasonAverage?.length == 1 ? SeasonAverageStats(seasonAverage[0]) : <div>Player has not played this season</div>;
 
   const getResultText = (game: Game, playerTeamId: number) => {
     const homeTeam = game.home_team_id;
@@ -174,13 +143,14 @@ export default function PlayerPage() {
   ];
 
   return loading ? <>Loading</> : <div>
-    <Box sx={{ flexGrow: 1 }} m="auto">
-      {player && <PlayerCard player={player} />}
-      <Grid>
-        {currentSeasonAverages}
-      </Grid>
-      <div>
-        Games from the last 30 days:
+    <Box sx={{ flexGrow: 1, width: '80vw' }} m="auto">
+      {player && <PlayerCard player={player} stats={
+        seasonAverage?.length == 1 ? seasonAverage[0] : null
+      } />}
+      <Grid xs={12}>
+        <h2>
+          Games from the last 30 days
+        </h2>
         <div style={{ height: 500, width: '100%' }}>
           <DataGrid
             rows={data}
@@ -188,7 +158,7 @@ export default function PlayerPage() {
             pageSize={25}
           />
         </div>
-      </div>
+      </Grid>
       <div>
         TODO: Past season stats
       </div>
