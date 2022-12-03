@@ -50,12 +50,12 @@ export default function Root() {
     {
       field: 'position',
       headerName: 'Position',
-      width: 160,
+      width: 130,
     },
     {
       field: 'height',
       headerName: 'Height',
-      width: 160,
+      width: 130,
       valueGetter: (params: GridValueGetterParams) => params.row.height_feet * 12 + params.row.height_inches,
     },
     {

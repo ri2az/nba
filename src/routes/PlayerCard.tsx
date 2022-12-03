@@ -16,7 +16,7 @@ export default function PlayerCard({ player, stats }: PlayerCardProps) {
   return <Grid container xs={12}>
     <Grid item xs={12}>
       <h1>
-        {player.first_name} {player.last_name}
+        {player.first_name} {player.last_name} ({player.position})
       </h1>
     </Grid>
     <Grid item xs={4}>

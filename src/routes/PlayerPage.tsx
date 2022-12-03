@@ -159,9 +159,6 @@ export default function PlayerPage() {
           />
         </div>
       </Grid>
-      <div>
-        TODO: Past season stats
-      </div>
     </Box>
   </div>;
 }
