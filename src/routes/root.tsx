@@ -23,7 +23,6 @@ export default function Root() {
         return response.json();
       })
       .then(data => {
-        console.log(data);
         setData(data);
       })
       .catch(err => setError(err))

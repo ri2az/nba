@@ -1,10 +1,11 @@
 import { Box, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Stats, SeasonAverage, Player } from "../types";
+import { Stats, SeasonAverage, Player, Game, Team } from "../types";
 import PlayerCard from "./PlayerCard";
 import moment from 'moment';
-import { DataGrid, GridColDef, GridToolbar, GridValueGetterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { green, red } from '@mui/material/colors';
 
 function SeasonAverageStats(stats: SeasonAverage) {
   return <div>
@@ -28,13 +29,15 @@ function SeasonAverageStats(stats: SeasonAverage) {
       TO: {stats.turnover}
     </div>
     <div>
-      FG%: {Math.round(stats.fg_pct*1000)/10}%
+      FG%: {Math.round(stats.fg_pct * 1000) / 10}%
     </div>
     <div>
-      3P%: {Math.round(stats.fg3_pct*1000)/10}%
+      3P%: {Math.round(stats.fg3_pct * 1000) / 10}%
     </div>
   </div>;
 }
+
+type TEAM_LOOKUP_TYPE = Record<number, Team>;
 
 export default function PlayerPage() {
   let { playerId } = useParams();
@@ -51,16 +54,24 @@ export default function PlayerPage() {
       fetch(`https://www.balldontlie.io/api/v1/stats?player_ids[]=${playerId}&start_date=${startDate}`).then(resp => resp.json()),
       fetch(`https://www.balldontlie.io/api/v1/players/${playerId}`).then(resp => resp.json()),
       fetch(`https://www.balldontlie.io/api/v1/season_averages?player_ids[]=${playerId}`).then(resp => resp.json()),
+      fetch('https://www.balldontlie.io/api/v1/teams').then(resp => resp.json())
     ]).then(res => {
       setData(
         res[0].data.sort(statDateComparator));
       setPlayer(res[1]);
       setSeasonAverage(res[2].data);
+
+      let teamObject: TEAM_LOOKUP_TYPE = {};
+      for (let i = 0; i < res[3].data.length; i++) {
+        teamObject[res[3].data[i].id] = res[3].data[i];
+      }
+      setTeams(teamObject);
     })
       .catch(err => setError(err))
       .finally(() => setLoading(false));
   }, []);
   const [data, setData] = useState<Stats[]>([]);
+  const [teams, setTeams] = useState<TEAM_LOOKUP_TYPE>([]);
   const [player, setPlayer] = useState<Player>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -72,14 +83,36 @@ export default function PlayerPage() {
     <></>);
   const currentSeasonAverages = seasonAverage?.length == 1 ? SeasonAverageStats(seasonAverage[0]) : <div>Player has not played this season</div>;
 
+  const getResultText = (game: Game, playerTeamId: number) => {
+    const homeTeam = game.home_team_id;
+    const scoreHome = game.home_team_score;
+    const scoreAway = game.visitor_team_score;
+
+    const winResult = (playerTeamId === homeTeam) ? scoreHome > scoreAway : scoreAway < scoreHome;
+
+    return `${winResult ? 'W' : 'L'} ${scoreHome}-${scoreAway}`;
+  }
+
+  const getOpponentText = (game: Game, playerTeamId: number) => {
+    const homeTeam = game.home_team_id;
+
+    return (playerTeamId === homeTeam) ? teams[game.visitor_team_id].name : teams[game.home_team_id].name;
+  }
+
   const columns: GridColDef[] = [
     {
       field: 'date', headerName: 'Date', width: 130,
       valueGetter: (params: GridValueGetterParams) => moment(params.row.game.date).format('ddd MM/DD'),
       sortComparator: dateComparator
     },
-    // { field: 'opponent', headerName: 'Opponent', width: 130 },
-    // { field: 'result', headerName: 'Opponent', width: 130 },
+    {
+      field: 'result', headerName: 'Result', width: 130,
+      valueGetter: (params: GridValueGetterParams) => getResultText(params.row.game, params.row.team.id),
+    },
+    {
+      field: 'opponent', headerName: 'Opponent', width: 130,
+      valueGetter: (params: GridValueGetterParams) => getOpponentText(params.row.game, params.row.team.id),
+    },
     {
       field: 'min',
       headerName: 'MIN',
