@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Player } from "../types";
+import { Player, PlayerEndpoint } from "../types";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import { DataGrid, GridCallbackDetails, GridColDef, GridRowParams, GridToolbar, GridValueGetterParams, MuiEvent } from '@mui/x-data-grid';
@@ -10,8 +10,8 @@ import { useNavigate } from "react-router-dom";
  * players with query specifiers.
  */
 export default function Root() {
-  useEffect(() => {
-    fetch('https://www.balldontlie.io/api/v1/players')
+  const fetchPlayers = (page: number, pageSize: number) => {
+    fetch(`https://www.balldontlie.io/api/v1/players?page=${page}&per_page=${pageSize}`)
       .then(response => {
         if (!response.ok) {
           throw new Error(
@@ -22,14 +22,22 @@ export default function Root() {
       })
       .then(data => {
         console.log(data);
-        setData(data.data);
+        setData(data);
       })
       .catch(err => setError(err))
       .finally(() => setLoading(false));
-  }, []);
-  const [data, setData] = useState<Player[]>([]);
+  };
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
+  const [data, setData] = useState<PlayerEndpoint>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => fetchPlayers(page+1, pageSize), [page, pageSize]);
+
+  const [rowCountState, setRowCountState] = useState(
+    data?.meta.total_count || 0,
+  );
 
   const columns: GridColDef[] = [
     { field: 'first_name', headerName: 'First name', width: 130 },
@@ -59,6 +67,13 @@ export default function Root() {
     console.log(params.row.first_name, 'clicked');
     navigate(`/player/${params.row.id}`);
   };
+  useEffect(() => {
+    setRowCountState((prevRowCountState) =>
+      data?.meta.total_count !== undefined
+        ? data?.meta.total_count
+        : prevRowCountState,
+    );
+  }, [data?.meta.total_count, setRowCountState]);
 
   return (<div>
     <Box sx={{ flexGrow: 1 }} m="auto">
@@ -69,12 +84,16 @@ export default function Root() {
         <div>Need to do pagination search</div>
         <div style={{ height: 800, width: '100%' }}>
           <DataGrid
-            rows={data}
+            rows={data?.data || []}
+            rowCount={rowCountState}
             columns={columns}
-            pageSize={10}
-            rowsPerPageOptions={[10,25]}
+            pageSize={pageSize}
+            paginationMode="server"
+            onPageChange={(newPage) => setPage(newPage)}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
             onRowClick={handleRowClick}
             components={{ Toolbar: GridToolbar }}
+            loading={loading}
           />
         </div>
       </Grid>

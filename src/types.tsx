@@ -45,7 +45,7 @@ export type Stats = {
   "turnover": number
 };
 
-export type MetaData = {
+export type Metadata = {
   current_page: number,
   next_page: number,
   per_page: number,
@@ -86,4 +86,9 @@ export type SeasonAverage = {
   "fg_pct": number,
   "fg3_pct": number,
   "ft_pct": number
+};
+
+export type PlayerEndpoint = {
+  data: Player[],
+  meta: Metadata,
 };
