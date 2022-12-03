@@ -13,7 +13,7 @@ function statBox(title: string, value: number | string) {
           {title}
         </h3>
       </Typography>
-      <Typography sx={{ fontSize: 14 }} color="text.primary">
+      <Typography sx={{ fontSize: 20 }} color="text.primary">
         <h4>
           {value}
         </h4>

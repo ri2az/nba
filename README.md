@@ -11,6 +11,8 @@ A dashboard for searching through NBA players and looking at their stats.
     - React
     - Material UI
     - React Router
+    - `moment` for time
+    - `awesome-debounce-promise` for debouncing API requests
 
 ## Design choices
 
