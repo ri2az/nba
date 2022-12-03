@@ -28,10 +28,10 @@ function SeasonAverageStats(stats: SeasonAverage) {
       TO: {stats.turnover}
     </div>
     <div>
-      FG%: {stats.fg_pct}%
+      FG%: {Math.round(stats.fg_pct*1000)/10}%
     </div>
     <div>
-      3PFG%: {stats.fg3_pct}%
+      3P%: {Math.round(stats.fg3_pct*1000)/10}%
     </div>
   </div>;
 }
@@ -152,7 +152,7 @@ export default function PlayerPage() {
           <DataGrid
             rows={data}
             columns={columns}
-            pageSize={30}
+            pageSize={25}
           />
         </div>
       </div>

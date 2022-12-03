@@ -63,6 +63,9 @@ export default function Root() {
   return (<div>
     <Box sx={{ flexGrow: 1 }} m="auto">
       <Grid xs={12}>
+        NBA STATS
+      </Grid>
+      <Grid xs={12}>
         <div>Need to do pagination search</div>
         <div style={{ height: 800, width: '100%' }}>
           <DataGrid
