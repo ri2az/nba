@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { PlayerEndpoint } from "../types";
+import { useCallback, useEffect, useState } from "react";
+import { Player, PlayerEndpoint } from "../types";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
-import { DataGrid, GridCallbackDetails, GridColDef, GridRowParams, GridToolbar, GridValueGetterParams, MuiEvent } from '@mui/x-data-grid';
 import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { AgGridReact } from "ag-grid-react";
-import { CellClickedEvent, PaginationChangedEvent, ValueGetterParams } from "ag-grid-community";
+import { CellClickedEvent, GetRowIdParams, GridReadyEvent, IServerSideGetRowsParams, PaginationChangedEvent, ValueGetterParams } from "ag-grid-community";
+import 'ag-grid-enterprise';
 
 const fetchPlayers = (
   page: number,
@@ -16,6 +16,7 @@ const fetchPlayers = (
   setData: React.Dispatch<React.SetStateAction<PlayerEndpoint | undefined>>,
   setError: React.Dispatch<React.SetStateAction<any>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  params: IServerSideGetRowsParams,
 ) => {
   fetch(`https://www.balldontlie.io/api/v1/players?page=${page}&per_page=${pageSize}&search=${searchQuery}`)
     .then(response => {
@@ -26,10 +27,17 @@ const fetchPlayers = (
       }
       return response.json();
     })
-    .then(data => {
+    .then((data: PlayerEndpoint) => {
       setData(data);
+      params.success({
+        rowData: data.data,
+        rowCount: data.meta.total_count
+      });
     })
-    .catch(err => setError(err))
+    .catch(err => {
+      setError(err);
+      params.fail();
+    })
     .finally(() => setLoading(false));
 };
 /**
@@ -50,18 +58,16 @@ export default function Root() {
   const [error, setError] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  /*
   useEffect(() => {
     fetchPlayersDebounced(page + 1, pageSize, searchQuery, setData, setError, setLoading);
   }, [page, pageSize, searchQuery, fetchPlayersDebounced]);
+  */
 
   const [rowCountState, setRowCountState] = useState<number>(
     data?.meta.total_count || 0,
   );
 
-  const navigate = useNavigate();
-  const handleRowClick = (params: GridRowParams, event: MuiEvent<React.MouseEvent>, details: GridCallbackDetails) => {
-    navigate(`/player/${params.row.id}`);
-  };
   useEffect(() => {
     setRowCountState((prevRowCountState) =>
       data?.meta.total_count !== undefined
@@ -71,9 +77,9 @@ export default function Root() {
   }, [data?.meta.total_count, setRowCountState]);
 
   // Each Column Definition results in one Column.
- const [columnDefs, setColumnDefs] = useState([
-    { field: 'first_name', headerName: 'First name'},
-    { field: 'last_name', headerName: 'Last name'},
+  const [columnDefs, setColumnDefs] = useState([
+    { field: 'first_name', headerName: 'First name' },
+    { field: 'last_name', headerName: 'Last name' },
     {
       field: 'position',
       headerName: 'Position',
@@ -81,19 +87,29 @@ export default function Root() {
     {
       field: 'height',
       headerName: 'Height',
-      valueGetter: (params : ValueGetterParams) => params.data.height_feet * 12 + params.data.height_inches,
+      valueGetter: (params: ValueGetterParams) => params.data.height_feet * 12 + params.data.height_inches,
     },
     {
       field: 'team',
       headerName: 'Team',
-      valueGetter: (params : ValueGetterParams) => params.data.team.name,
+      valueGetter: (params: ValueGetterParams) => params.data.team.name,
     }
-]);
+  ]);
 
-// Example of consuming Grid Event
-const cellClickedListener = useCallback( (event : CellClickedEvent) => {
-  navigate(`/player/${event.data.id}`);
-}, []);
+  const navigate = useNavigate();
+  // Example of consuming Grid Event
+  const cellClickedListener = useCallback((event: CellClickedEvent) => {
+    navigate(`/player/${event.data.id}`);
+  }, [navigate]);
+
+
+  const onGridReady = useCallback((params: GridReadyEvent) => {
+    params.api.setServerSideDatasource({
+      getRows: (params: IServerSideGetRowsParams) => {
+        fetchPlayersDebounced(page, pageSize, searchQuery, setData, setError, setLoading, params);
+      },
+    });
+  }, [page, pageSize, searchQuery, setData, setError, setLoading]);
 
   return (<div>
     <Box sx={{ flexGrow: 1, width: '80vw', flexDirection: 'column' }} m="auto" display="flex" justifyContent="center">
@@ -113,22 +129,26 @@ const cellClickedListener = useCallback( (event : CellClickedEvent) => {
         />
       </Grid>
       <Grid xs={12}>
-        <div className="ag-theme-alpine-dark" style={{ height: '80vh'}}>
-        <AgGridReact
-           rowData={data ? data.data : []} // Row Data for Rows
+        <div className="ag-theme-alpine-dark" style={{ height: '80vh' }}>
+          <AgGridReact
+            rowData={data ? data.data : []} // Row Data for Rows
 
-           columnDefs={columnDefs} // Column Defs for Columns
-           defaultColDef={{ sortable: true }} // Default Column Properties
+            columnDefs={columnDefs} // Column Defs for Columns
+            defaultColDef={{ sortable: true }} // Default Column Properties
 
-           animateRows={true} // Optional - set to 'true' to have rows animate when sorted
-           rowSelection='multiple' // Options - allows click selection of rows
+            animateRows={true} // Optional - set to 'true' to have rows animate when sorted
+            rowSelection='multiple' // Options - allows click selection of rows
 
-           onCellClicked={cellClickedListener} // Optional - registering for Grid Event
-           loadingCellRenderer={loading}
-           pagination={true}
-           paginationPageSize={pageSize}
-           onPaginationChanged={(event : PaginationChangedEvent) => setPage(event.api.paginationGetCurrentPage())}
-           />
+            onCellClicked={cellClickedListener} // Optional - registering for Grid Event
+            loadingCellRenderer={loading}
+            pagination={true}
+            paginationPageSize={pageSize}
+            cacheBlockSize={pageSize}
+            onPaginationChanged={(event: PaginationChangedEvent) => setPage(event.api.paginationGetCurrentPage())}
+            rowModelType='serverSide'
+            onGridReady={onGridReady}
+            getRowId={(params: GetRowIdParams<Player>) => String(params.data.id)}
+          />
         </div>
       </Grid>
     </Box>
