@@ -8,12 +8,12 @@ type SeasonAverageStatsProps = {
 function statBox(title: string, value: number | string) {
   return <Grid item xs={3}>
     <Card sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} variant="outlined">
-      <Typography color="text.primary" gutterBottom>
+      <Typography color="text.primary" component={'span'} gutterBottom>
         <h3>
           {title}
         </h3>
       </Typography>
-      <Typography sx={{ fontSize: 20 }} color="text.primary">
+      <Typography sx={{ fontSize: 20 }} color="text.primary" component={'span'}>
         <h4>
           {value}
         </h4>

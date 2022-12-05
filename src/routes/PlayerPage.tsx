@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { Stats, SeasonAverage, Player, Game, Team } from "../types";
 import PlayerCard from "./PlayerCard";
 import moment from 'moment';
-import { DataGrid, GridColDef, GridRowParams, GridValueGetterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import PlayerStatsChart from "./PlayerStatsChart";
 
@@ -49,9 +49,6 @@ export default function PlayerPage() {
   const [seasonAverage, setSeasonAverage] = useState<SeasonAverage[]>();
 
   const playerName = <div>{player?.first_name} {player?.last_name}</div>;
-  const emptyStats = <div>No stats found for {playerName}</div>;
-  const playerStats = (
-    <></>);
 
   const getResultText = (game: Game, playerTeamId: number) => {
     const homeTeam = game.home_team_id;
@@ -156,7 +153,7 @@ export default function PlayerPage() {
       {player && <PlayerCard player={player} stats={
         seasonAverage?.length == 1 ? seasonAverage[0] : null
       } />}
-      <Grid xs={12}>
+      <Grid item xs={12}>
         <h2>
           Games from the last 30 days
         </h2>

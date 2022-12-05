@@ -1,30 +1,34 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import * as d3 from "d3";
-import { Grid } from "@mui/material";
-import { Stats } from "../types";
+import { Grid, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { NumberStats, Stats } from "../types";
 
 type PlayerStatsChartProps = {
   stats: Stats[]
 };
 
 export default function PlayerStatsChart({ stats }: PlayerStatsChartProps) {
-  const createGraph = () => {
+  const [statProperty, setStatProperty] = useState<NumberStats>('pts');
+
+  const createGraph = (statProperty: NumberStats) => {
     console.log('stats', stats);
     let margin = { top: 20, right: 20, bottom: 50, left: 70 },
       width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
-    // append the graph, but remove the svg if it already exists
+
+    // Append the graph, but remove the svg if it already exists
     d3.select('#graph-stats svg').remove();
     let svg = d3.select("#graph-stats").append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
     // Add X axis and Y axis
     let x = d3.scaleTime().range([0, width]);
     let y = d3.scaleLinear().range([height, 0]);
     x.domain(d3.extent(stats, d => new Date(d.game.date)) as [Date, Date]);
-    y.domain([0, d3.max(stats, d => d.pts) as number]);
+    y.domain([0, d3.max(stats, d => d[statProperty] as number) as number]);
     svg.append("g")
       .attr("transform", `translate(0, ${height})`)
       .call(d3.axisBottom<Date>(x)
@@ -36,22 +40,47 @@ export default function PlayerStatsChart({ stats }: PlayerStatsChartProps) {
       .style("font-size", "18px");
 
     // Add the line data
+    const strokeWidth = 1.5;
     svg.append('path')
       .data([stats])
       .attr('fill', 'none')
       .attr('stroke', 'white')
-      .attr('stroke-width', 1.5)
+      .attr('stroke-width', strokeWidth)
       .attr('d', d3.line<any>()
         .x(d => x(new Date(d.game.date)))
-        .y(d => y(d.pts))
+        .y(d => y(d[statProperty]))
       );
   }
   useEffect(() => {
-    createGraph();
-  }, [createGraph, stats]);
+    createGraph(statProperty);
+  }, [createGraph, stats, statProperty]);
+
+  const statOptions = {
+    "ast": "AST",
+    "pts": "PTS",
+    "blk": "BLK",
+    "reb": "REB",
+    "fg3_pct": "3P%",
+    "fg_pct": "FG%",
+    "min" : "MIN",
+    "stl": "STL",
+    "turnover": "TO"
+  };
+
+  console.log(Object.entries(statOptions))
+
   return (
     <Grid item xs={12}>
       <h2>Last few games stats chart</h2>
+      <Select
+        value={statProperty}
+        onChange={(event: SelectChangeEvent) => setStatProperty(event.target.value as NumberStats)}
+      >
+        {Object.entries(statOptions).map(
+          stat =>
+          <MenuItem value={stat[0]}>{stat[1]}</MenuItem>
+        )}
+      </Select>
       <div id="graph-stats">
       </div>
     </Grid>
