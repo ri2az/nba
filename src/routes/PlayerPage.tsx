@@ -57,7 +57,7 @@ export default function PlayerPage() {
     const scoreHome = game.home_team_score;
     const scoreAway = game.visitor_team_score;
 
-    const winResult = (playerTeamId === homeTeam) ? scoreHome > scoreAway : scoreAway < scoreHome;
+    const winResult = (playerTeamId === homeTeam) ? scoreHome > scoreAway : scoreAway > scoreHome;
 
     return `${winResult ? 'W' : 'L'} ${scoreHome}-${scoreAway}`;
   }
