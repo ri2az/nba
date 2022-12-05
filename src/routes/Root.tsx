@@ -30,7 +30,12 @@ const fetchPlayers = (
     .catch(err => setError(err))
     .finally(() => setLoading(false));
 };
+/**
+ * We debounce this fetch so that search doesn't send a ton of requests to the
+ * server.
+ */
 const fetchPlayersDebounced = AwesomeDebouncePromise(fetchPlayers, 300);
+
 /**
  * Home page where we see all the players to choose from, and we can filter the
  * players with query specifiers.
@@ -40,14 +45,14 @@ export default function Root() {
   const [pageSize, setPageSize] = useState<number>(25);
   const [data, setData] = useState<PlayerEndpoint>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     fetchPlayersDebounced(page + 1, pageSize, searchQuery, setData, setError, setLoading);
   }, [page, pageSize, searchQuery, fetchPlayersDebounced]);
 
-  const [rowCountState, setRowCountState] = useState(
+  const [rowCountState, setRowCountState] = useState<number>(
     data?.meta.total_count || 0,
   );
 

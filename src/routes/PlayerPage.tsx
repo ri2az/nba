@@ -48,8 +48,8 @@ export default function PlayerPage() {
   const [data, setData] = useState<Stats[]>([]);
   const [teams, setTeams] = useState<TEAM_LOOKUP_TYPE>([]);
   const [player, setPlayer] = useState<Player>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<any>(null);
   const [seasonAverage, setSeasonAverage] = useState<SeasonAverage[]>();
 
   const getResultText = (game: Game, playerTeamId: number) => {
