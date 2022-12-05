@@ -4,7 +4,7 @@ A dashboard for searching through NBA players and looking at their stats.
 
 ## Features
 
-- Auto-search bar
+- Auto-search bar by player name
 - Pagination of players
 - Player stats on each page
 - Technologies used:
@@ -17,6 +17,7 @@ A dashboard for searching through NBA players and looking at their stats.
 ## Design choices
 
 - **Debounced search query** by 300ms. The API has a limit of 60 requests per minute, so the automatic search bar on text change might go over that limit without some debouncing. If needed we can make the search bar even quicker with no debouncing, but we don't have the rate limit capacity in the free API. It also seems silly to search 6 times when you type in something like `lebron`
+- Search only by player name. The API doesn't support searching + pagination for other attributes, only player name.
 - Past season stats are not easily retrievable and take too many requests, since we have to
   1. Find the seasons the player played in
   2. Then query EACH season, this could be a lot of requests which is bad
