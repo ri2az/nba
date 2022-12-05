@@ -27,8 +27,8 @@ function statBox(title: string, value: number | string) {
  */
 export default function SeasonAverageStats({ stats }: SeasonAverageStatsProps) {
   if (stats) {
-    return <Grid xs={8} spacing={2}>
-      <Grid container>
+    return <Grid item xs={8}>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
           <h3>
             Stats for {stats.season}-{stats.season + 1} Season

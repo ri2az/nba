@@ -167,7 +167,7 @@ export default function PlayerPage() {
           />
         </div>
       </Grid>
-      <PlayerStatsChart stats={data}/>
+      {data && <PlayerStatsChart stats={data}/>}
     </Box>
   </div>;
 }

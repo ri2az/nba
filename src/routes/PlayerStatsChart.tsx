@@ -11,7 +11,6 @@ export default function PlayerStatsChart({ stats }: PlayerStatsChartProps) {
   const [statProperty, setStatProperty] = useState<NumberStats>('pts');
 
   const createGraph = useCallback((statProperty: NumberStats) => {
-    console.log('stats', stats);
     let margin = { top: 20, right: 20, bottom: 50, left: 70 },
       width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
@@ -68,8 +67,6 @@ export default function PlayerStatsChart({ stats }: PlayerStatsChartProps) {
     "stl": "STL",
     "turnover": "TO"
   };
-
-  console.log(Object.entries(statOptions))
 
   return (
     <Grid item xs={12}>
