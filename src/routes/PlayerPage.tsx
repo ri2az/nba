@@ -6,6 +6,7 @@ import PlayerCard from "./PlayerCard";
 import moment from 'moment';
 import { DataGrid, GridColDef, GridRowParams, GridValueGetterParams } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
+import PlayerStatsChart from "./PlayerStatsChart";
 
 type TEAM_LOOKUP_TYPE = Record<number, Team>;
 
@@ -167,6 +168,7 @@ export default function PlayerPage() {
           />
         </div>
       </Grid>
+      <PlayerStatsChart stats={data}/>
     </Box>
   </div>;
 }
