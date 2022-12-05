@@ -15,6 +15,7 @@
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
     "awesome-debounce-promise": "^2.1.0",
+    "d3": "^7.7.0",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
     "moment": "^2.29.4",
@@ -51,6 +52,7 @@
     ]
   },
   "devDependencies": {
+    "@types/d3": "^7.4.0",
     "sass": "^1.56.1"
   }
 }

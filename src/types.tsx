@@ -19,6 +19,8 @@ export type Team = {
   name: string,
 }
 
+export type NumberStats = "ast" | "pts" | "blk" | "reb" | "fg3_pct" | "fg_pct" | "ft_pct" | "min" | "stl" | "turnover";
+
 export type Stats = {
   "id": number,
   "ast": number,

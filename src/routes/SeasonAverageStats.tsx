@@ -8,12 +8,12 @@ type SeasonAverageStatsProps = {
 function statBox(title: string, value: number | string) {
   return <Grid item xs={3}>
     <Card sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} variant="outlined">
-      <Typography color="text.primary" gutterBottom>
+      <Typography color="text.primary" component={'span'} gutterBottom>
         <h3>
           {title}
         </h3>
       </Typography>
-      <Typography sx={{ fontSize: 20 }} color="text.primary">
+      <Typography sx={{ fontSize: 20 }} color="text.primary" component={'span'}>
         <h4>
           {value}
         </h4>
@@ -22,9 +22,13 @@ function statBox(title: string, value: number | string) {
   </Grid>;
 }
 
+/**
+ * Shows a bunch of boxes of stats the player has
+ */
 export default function SeasonAverageStats({ stats }: SeasonAverageStatsProps) {
   if (stats) {
-    return <Grid container xs={8} spacing={2}>
+    return <Grid item xs={8}>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
           <h3>
             Stats for {stats.season}-{stats.season + 1} Season
@@ -40,7 +44,8 @@ export default function SeasonAverageStats({ stats }: SeasonAverageStatsProps) {
           Math.round(stats.fg_pct * 1000) / 10)}
         {statBox('3P%',
           Math.round(stats.fg3_pct * 1000) / 10)}
-      </Grid>;
+      </Grid>
+    </Grid>;
   } else {
     return <div>Player has not played this season</div>
   };
