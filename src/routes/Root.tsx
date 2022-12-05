@@ -85,7 +85,7 @@ export default function Root() {
   const onGridReady = useCallback((params: GridReadyEvent) => {
     params.api.setServerSideDatasource({
       getRows: (params: IServerSideGetRowsParams) => {
-        fetchPlayersDebounced(page+1, pageSize, searchQuery, setError, setLoading, params);
+        fetchPlayersDebounced(page + 1, pageSize, searchQuery, setError, setLoading, params);
       },
     });
   }, [page, pageSize, searchQuery, setError, setLoading]);
@@ -111,7 +111,7 @@ export default function Root() {
         <div className="ag-theme-alpine-dark" style={{ height: '80vh' }}>
           <AgGridReact
             columnDefs={columnDefs}
-            defaultColDef={{ sortable: true }}
+            defaultColDef={{ sortable: true, resizable: true }}
             animateRows={true}
             onCellClicked={cellClickedListener}
             loadingCellRenderer={loading}
