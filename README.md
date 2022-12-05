@@ -21,3 +21,9 @@ A dashboard for searching through NBA players and looking at their stats.
   1. Find the seasons the player played in
   2. Then query EACH season, this could be a lot of requests which is bad
   3. We could potentially have like a "see more" for the season, but I think this is something the server side API should support better, to get the past season averages for the player
+
+## Features I didn't get to
+
+- Better error handling: right now errors just show up in the console or a 404 page shows
+- Better display of missing data
+- I think I might be unnecessarily rendering one of the pages, so it's hitting the API endpoint twice. Probably need to `useMemo` somewhere or just prevent rerendering.
