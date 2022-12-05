@@ -38,7 +38,7 @@ export default function Root() {
 
   useEffect(() => {
     fetchPlayersDebounced(page + 1, pageSize, searchQuery);
-  }, [page, pageSize, searchQuery]);
+  }, [page, pageSize, searchQuery, fetchPlayersDebounced]);
 
   const [rowCountState, setRowCountState] = useState(
     data?.meta.total_count || 0,

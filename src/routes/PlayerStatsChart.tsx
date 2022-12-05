@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { Grid, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { NumberStats, Stats } from "../types";
@@ -10,7 +10,7 @@ type PlayerStatsChartProps = {
 export default function PlayerStatsChart({ stats }: PlayerStatsChartProps) {
   const [statProperty, setStatProperty] = useState<NumberStats>('pts');
 
-  const createGraph = (statProperty: NumberStats) => {
+  const createGraph = useCallback((statProperty: NumberStats) => {
     console.log('stats', stats);
     let margin = { top: 20, right: 20, bottom: 50, left: 70 },
       width = 960 - margin.left - margin.right,
@@ -50,7 +50,8 @@ export default function PlayerStatsChart({ stats }: PlayerStatsChartProps) {
         .x(d => x(new Date(d.game.date)))
         .y(d => statProperty.includes("pct") ? y(100 * d[statProperty]) : y(d[statProperty]))
       );
-  }
+  }, [stats]);
+
   useEffect(() => {
     createGraph(statProperty);
   }, [createGraph, stats, statProperty]);

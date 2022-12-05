@@ -10,6 +10,10 @@ import PlayerStatsChart from "./PlayerStatsChart";
 
 type TEAM_LOOKUP_TYPE = Record<number, Team>;
 
+/**
+ * When you click into a player, this is the page that shows the player's
+ * stats, along with the past few games they've played.
+ */
 export default function PlayerPage() {
   let { playerId } = useParams();
   let startDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
@@ -40,15 +44,13 @@ export default function PlayerPage() {
     })
       .catch(err => setError(err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [startDate, playerId]);
   const [data, setData] = useState<Stats[]>([]);
   const [teams, setTeams] = useState<TEAM_LOOKUP_TYPE>([]);
   const [player, setPlayer] = useState<Player>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [seasonAverage, setSeasonAverage] = useState<SeasonAverage[]>();
-
-  const playerName = <div>{player?.first_name} {player?.last_name}</div>;
 
   const getResultText = (game: Game, playerTeamId: number) => {
     const homeTeam = game.home_team_id;
@@ -151,7 +153,7 @@ export default function PlayerPage() {
         Go back to all players page
       </h4>
       {player && <PlayerCard player={player} stats={
-        seasonAverage?.length == 1 ? seasonAverage[0] : null
+        seasonAverage?.length === 1 ? seasonAverage[0] : null
       } />}
       <Grid item xs={12}>
         <h2>

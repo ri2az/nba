@@ -10,7 +10,6 @@ import Root from "./routes/Root";
 import PlayerPage from "./routes/PlayerPage";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import * as d3 from 'd3';
 
 const darkTheme = createTheme({
   palette: {

@@ -22,9 +22,13 @@ function statBox(title: string, value: number | string) {
   </Grid>;
 }
 
+/**
+ * Shows a bunch of boxes of stats the player has
+ */
 export default function SeasonAverageStats({ stats }: SeasonAverageStatsProps) {
   if (stats) {
-    return <Grid container spacing={2}>
+    return <Grid xs={8} spacing={2}>
+      <Grid container>
         <Grid item xs={12}>
           <h3>
             Stats for {stats.season}-{stats.season + 1} Season
@@ -40,7 +44,8 @@ export default function SeasonAverageStats({ stats }: SeasonAverageStatsProps) {
           Math.round(stats.fg_pct * 1000) / 10)}
         {statBox('3P%',
           Math.round(stats.fg3_pct * 1000) / 10)}
-      </Grid>;
+      </Grid>
+    </Grid>;
   } else {
     return <div>Player has not played this season</div>
   };
