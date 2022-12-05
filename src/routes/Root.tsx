@@ -13,7 +13,6 @@ const fetchPlayers = (
   page: number,
   pageSize: number,
   searchQuery: string,
-  setData: React.Dispatch<React.SetStateAction<PlayerEndpoint | undefined>>,
   setError: React.Dispatch<React.SetStateAction<any>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   params: IServerSideGetRowsParams,
@@ -28,7 +27,6 @@ const fetchPlayers = (
       return response.json();
     })
     .then((data: PlayerEndpoint) => {
-      setData(data);
       params.success({
         rowData: data.data,
         rowCount: data.meta.total_count
@@ -53,28 +51,9 @@ const fetchPlayersDebounced = AwesomeDebouncePromise(fetchPlayers, 300);
 export default function Root() {
   const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(25);
-  const [data, setData] = useState<PlayerEndpoint>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
-
-  /*
-  useEffect(() => {
-    fetchPlayersDebounced(page + 1, pageSize, searchQuery, setData, setError, setLoading);
-  }, [page, pageSize, searchQuery, fetchPlayersDebounced]);
-  */
-
-  const [rowCountState, setRowCountState] = useState<number>(
-    data?.meta.total_count || 0,
-  );
-
-  useEffect(() => {
-    setRowCountState((prevRowCountState) =>
-      data?.meta.total_count !== undefined
-        ? data?.meta.total_count
-        : prevRowCountState,
-    );
-  }, [data?.meta.total_count, setRowCountState]);
 
   // Each Column Definition results in one Column.
   const [columnDefs, setColumnDefs] = useState([
@@ -106,10 +85,10 @@ export default function Root() {
   const onGridReady = useCallback((params: GridReadyEvent) => {
     params.api.setServerSideDatasource({
       getRows: (params: IServerSideGetRowsParams) => {
-        fetchPlayersDebounced(page, pageSize, searchQuery, setData, setError, setLoading, params);
+        fetchPlayersDebounced(page+1, pageSize, searchQuery, setError, setLoading, params);
       },
     });
-  }, [page, pageSize, searchQuery, setData, setError, setLoading]);
+  }, [page, pageSize, searchQuery, setError, setLoading]);
 
   return (<div>
     <Box sx={{ flexGrow: 1, width: '80vw', flexDirection: 'column' }} m="auto" display="flex" justifyContent="center">
@@ -131,23 +110,18 @@ export default function Root() {
       <Grid xs={12}>
         <div className="ag-theme-alpine-dark" style={{ height: '80vh' }}>
           <AgGridReact
-            rowData={data ? data.data : []} // Row Data for Rows
-
-            columnDefs={columnDefs} // Column Defs for Columns
-            defaultColDef={{ sortable: true }} // Default Column Properties
-
-            animateRows={true} // Optional - set to 'true' to have rows animate when sorted
-            rowSelection='multiple' // Options - allows click selection of rows
-
-            onCellClicked={cellClickedListener} // Optional - registering for Grid Event
+            columnDefs={columnDefs}
+            defaultColDef={{ sortable: true }}
+            animateRows={true}
+            onCellClicked={cellClickedListener}
             loadingCellRenderer={loading}
             pagination={true}
             paginationPageSize={pageSize}
             cacheBlockSize={pageSize}
             onPaginationChanged={(event: PaginationChangedEvent) => setPage(event.api.paginationGetCurrentPage())}
             rowModelType='serverSide'
-            onGridReady={onGridReady}
             getRowId={(params: GetRowIdParams<Player>) => String(params.data.id)}
+            onGridReady={onGridReady}
           />
         </div>
       </Grid>
