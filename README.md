@@ -27,3 +27,10 @@ A dashboard for searching through NBA players and looking at their stats.
 - Better error handling: right now errors just show up in the console or a 404 page shows
 - Better display of missing data
 - I think I might be unnecessarily rendering one of the pages, so it's hitting the API endpoint twice. Probably need to `useMemo` somewhere or just prevent rerendering.
+
+## Screenshots
+
+<img width="1420" alt="image" src="https://user-images.githubusercontent.com/12106484/205600798-9f2c62b6-821f-4b6f-80cf-21e62f10b2ba.png">
+<img width="1416" alt="image" src="https://user-images.githubusercontent.com/12106484/205600656-2afc18f4-d037-4506-896c-1a0006a8ba11.png">
+<img width="1018" alt="image" src="https://user-images.githubusercontent.com/12106484/205600745-46f2022e-933f-4a08-94b7-e62dc604139c.png">
+
