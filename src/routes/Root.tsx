@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PlayerEndpoint } from "../types";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
@@ -6,6 +6,8 @@ import { DataGrid, GridCallbackDetails, GridColDef, GridRowParams, GridToolbar, 
 import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
+import { AgGridReact } from "ag-grid-react";
+import { CellClickedEvent, PaginationChangedEvent, ValueGetterParams } from "ag-grid-community";
 
 const fetchPlayers = (
   page: number,
@@ -56,28 +58,6 @@ export default function Root() {
     data?.meta.total_count || 0,
   );
 
-  const columns: GridColDef[] = [
-    { field: 'first_name', headerName: 'First name', width: 200 },
-    { field: 'last_name', headerName: 'Last name', width: 200 },
-    {
-      field: 'position',
-      headerName: 'Position',
-      width: 130,
-    },
-    {
-      field: 'height',
-      headerName: 'Height',
-      width: 130,
-      valueGetter: (params: GridValueGetterParams) => params.row.height_feet * 12 + params.row.height_inches,
-    },
-    {
-      field: 'team',
-      headerName: 'Team',
-      width: 160,
-      valueGetter: (params: GridValueGetterParams) => params.row.team.name,
-    }
-  ];
-
   const navigate = useNavigate();
   const handleRowClick = (params: GridRowParams, event: MuiEvent<React.MouseEvent>, details: GridCallbackDetails) => {
     navigate(`/player/${params.row.id}`);
@@ -89,6 +69,31 @@ export default function Root() {
         : prevRowCountState,
     );
   }, [data?.meta.total_count, setRowCountState]);
+
+  // Each Column Definition results in one Column.
+ const [columnDefs, setColumnDefs] = useState([
+    { field: 'first_name', headerName: 'First name'},
+    { field: 'last_name', headerName: 'Last name'},
+    {
+      field: 'position',
+      headerName: 'Position',
+    },
+    {
+      field: 'height',
+      headerName: 'Height',
+      valueGetter: (params : ValueGetterParams) => params.data.height_feet * 12 + params.data.height_inches,
+    },
+    {
+      field: 'team',
+      headerName: 'Team',
+      valueGetter: (params : ValueGetterParams) => params.data.team.name,
+    }
+]);
+
+// Example of consuming Grid Event
+const cellClickedListener = useCallback( (event : CellClickedEvent) => {
+  navigate(`/player/${event.data.id}`);
+}, []);
 
   return (<div>
     <Box sx={{ flexGrow: 1, width: '80vw', flexDirection: 'column' }} m="auto" display="flex" justifyContent="center">
@@ -108,19 +113,22 @@ export default function Root() {
         />
       </Grid>
       <Grid xs={12}>
-        <div style={{ height: '80vh' }}>
-          <DataGrid
-            rows={data?.data || []}
-            rowCount={rowCountState}
-            columns={columns}
-            pageSize={pageSize}
-            paginationMode="server"
-            onPageChange={(newPage) => setPage(newPage)}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            onRowClick={handleRowClick}
-            components={{ Toolbar: GridToolbar }}
-            loading={loading}
-          />
+        <div className="ag-theme-alpine-dark" style={{ height: '80vh'}}>
+        <AgGridReact
+           rowData={data ? data.data : []} // Row Data for Rows
+
+           columnDefs={columnDefs} // Column Defs for Columns
+           defaultColDef={{ sortable: true }} // Default Column Properties
+
+           animateRows={true} // Optional - set to 'true' to have rows animate when sorted
+           rowSelection='multiple' // Options - allows click selection of rows
+
+           onCellClicked={cellClickedListener} // Optional - registering for Grid Event
+           loadingCellRenderer={loading}
+           pagination={true}
+           paginationPageSize={pageSize}
+           onPaginationChanged={(event : PaginationChangedEvent) => setPage(event.api.paginationGetCurrentPage())}
+           />
         </div>
       </Grid>
     </Box>
