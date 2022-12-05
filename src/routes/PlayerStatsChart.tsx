@@ -28,7 +28,7 @@ export default function PlayerStatsChart({ stats }: PlayerStatsChartProps) {
     let x = d3.scaleTime().range([0, width]);
     let y = d3.scaleLinear().range([height, 0]);
     x.domain(d3.extent(stats, d => new Date(d.game.date)) as [Date, Date]);
-    y.domain([0, d3.max(stats, d => d[statProperty] as number) as number]);
+    y.domain([0, d3.max(stats, d => statProperty.includes("pct") ? 100 * (d[statProperty] as number) : d[statProperty] as number) as number]);
     svg.append("g")
       .attr("transform", `translate(0, ${height})`)
       .call(d3.axisBottom<Date>(x)
@@ -48,7 +48,7 @@ export default function PlayerStatsChart({ stats }: PlayerStatsChartProps) {
       .attr('stroke-width', strokeWidth)
       .attr('d', d3.line<any>()
         .x(d => x(new Date(d.game.date)))
-        .y(d => y(d[statProperty]))
+        .y(d => statProperty.includes("pct") ? y(100 * d[statProperty]) : y(d[statProperty]))
       );
   }
   useEffect(() => {
@@ -62,7 +62,8 @@ export default function PlayerStatsChart({ stats }: PlayerStatsChartProps) {
     "reb": "REB",
     "fg3_pct": "3P%",
     "fg_pct": "FG%",
-    "min" : "MIN",
+    "ft_pct": "FT%",
+    "min": "MIN",
     "stl": "STL",
     "turnover": "TO"
   };
@@ -78,7 +79,7 @@ export default function PlayerStatsChart({ stats }: PlayerStatsChartProps) {
       >
         {Object.entries(statOptions).map(
           stat =>
-          <MenuItem value={stat[0]}>{stat[1]}</MenuItem>
+            <MenuItem key={stat[0]} value={stat[0]}>{stat[1]}</MenuItem>
         )}
       </Select>
       <div id="graph-stats">
