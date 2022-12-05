@@ -7,37 +7,44 @@ import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 
+const fetchPlayers = (
+  page: number,
+  pageSize: number,
+  searchQuery: string,
+  setData: React.Dispatch<React.SetStateAction<PlayerEndpoint | undefined>>,
+  setError: React.Dispatch<React.SetStateAction<any>>,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+) => {
+  fetch(`https://www.balldontlie.io/api/v1/players?page=${page}&per_page=${pageSize}&search=${searchQuery}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(
+          `HTTP error: The status is ${response.status}`
+        );
+      }
+      return response.json();
+    })
+    .then(data => {
+      setData(data);
+    })
+    .catch(err => setError(err))
+    .finally(() => setLoading(false));
+};
+const fetchPlayersDebounced = AwesomeDebouncePromise(fetchPlayers, 300);
 /**
  * Home page where we see all the players to choose from, and we can filter the
  * players with query specifiers.
  */
 export default function Root() {
-  const fetchPlayers = (page: number, pageSize: number, searchQuery: string) => {
-    fetch(`https://www.balldontlie.io/api/v1/players?page=${page}&per_page=${pageSize}&search=${searchQuery}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(
-            `HTTP error: The status is ${response.status}`
-          );
-        }
-        return response.json();
-      })
-      .then(data => {
-        setData(data);
-      })
-      .catch(err => setError(err))
-      .finally(() => setLoading(false));
-  };
-  const fetchPlayersDebounced = AwesomeDebouncePromise(fetchPlayers, 300);
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(25);
+  const [page, setPage] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(25);
   const [data, setData] = useState<PlayerEndpoint>();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
-    fetchPlayersDebounced(page + 1, pageSize, searchQuery);
+    fetchPlayersDebounced(page + 1, pageSize, searchQuery, setData, setError, setLoading);
   }, [page, pageSize, searchQuery, fetchPlayersDebounced]);
 
   const [rowCountState, setRowCountState] = useState(
@@ -96,20 +103,20 @@ export default function Root() {
         />
       </Grid>
       <Grid xs={12}>
-      <div style={{ height: '80vh' }}>
-        <DataGrid
-          rows={data?.data || []}
-          rowCount={rowCountState}
-          columns={columns}
-          pageSize={pageSize}
-          paginationMode="server"
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          onRowClick={handleRowClick}
-          components={{ Toolbar: GridToolbar }}
-          loading={loading}
-        />
-      </div>
+        <div style={{ height: '80vh' }}>
+          <DataGrid
+            rows={data?.data || []}
+            rowCount={rowCountState}
+            columns={columns}
+            pageSize={pageSize}
+            paginationMode="server"
+            onPageChange={(newPage) => setPage(newPage)}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            onRowClick={handleRowClick}
+            components={{ Toolbar: GridToolbar }}
+            loading={loading}
+          />
+        </div>
       </Grid>
     </Box>
   </div>);
