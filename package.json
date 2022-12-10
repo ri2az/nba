@@ -1,7 +1,7 @@
 {
   "name": "nba-stats",
   "version": "0.1.0",
-  "homepage": "https://mikinty.github.io/nba-stats",
+  "homepage": "https://ri2az.github.io/nba",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.5",
